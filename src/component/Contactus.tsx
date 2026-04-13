@@ -1,34 +1,129 @@
 "use client"
 
 import type { FormEvent } from "react"
-import { CONTACT_EMAIL } from "@/constant"
+import { useState } from "react"
 
 const CONTACT_DESCRIPTION =
 "Interested in joining or have questions about the chapter? Reach out and our membership team will get back to you within 48 hours."
+
+type ContactFormValues = {
+  name: string
+  phone: string
+  email: string
+  subject: string
+  message: string
+}
+
+type ContactFormErrors = Partial<Record<keyof ContactFormValues, string>>
+
+const INITIAL_VALUES: ContactFormValues = {
+  name: "",
+  phone: "",
+  email: "",
+  subject: "",
+  message: "",
+}
+
+const GOOGLE_SHEET_WEBHOOK_URL =
+  process.env.NEXT_PUBLIC_GOOGLE_SHEET_WEBHOOK_URL ?? ""
+
 export const Contactus = () => {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const [values, setValues] = useState<ContactFormValues>(INITIAL_VALUES)
+  const [errors, setErrors] = useState<ContactFormErrors>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
+
+  const validateForm = (formValues: ContactFormValues) => {
+    const nextErrors: ContactFormErrors = {}
+
+    if (!formValues.name.trim()) nextErrors.name = "Name is required."
+    if (!formValues.phone.trim()) {
+      nextErrors.phone = "Mobile number is required."
+    } else if (!/^[+\d][\d\s-]{7,14}$/.test(formValues.phone.trim())) {
+      nextErrors.phone = "Please enter a valid mobile number."
+    }
+    if (!formValues.email.trim()) {
+      nextErrors.email = "Email is required."
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email.trim())) {
+      nextErrors.email = "Please enter a valid email address."
+    }
+    if (!formValues.subject.trim()) nextErrors.subject = "Subject is required."
+    if (!formValues.message.trim()) nextErrors.message = "Message is required."
+
+    return nextErrors
+  }
+
+  const validateField = (
+    key: keyof ContactFormValues,
+    value: string,
+  ) => {
+    const nextValues = { ...values, [key]: value }
+    return validateForm(nextValues)[key]
+  }
+
+  const handleChange = (
+    key: keyof ContactFormValues,
+    value: string,
+  ) => {
+    setValues((prev) => ({ ...prev, [key]: value }))
+    setErrors((prev) => ({
+      ...prev,
+      [key]: prev[key] ? validateField(key, value) : undefined,
+    }))
+  }
+
+  const handleBlur = (key: keyof ContactFormValues, value: string) => {
+    setErrors((prev) => ({ ...prev, [key]: validateField(key, value) }))
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setSubmitMessage("")
 
-    const formData = new FormData(event.currentTarget)
-    const name = String(formData.get("name") ?? "").trim()
-    const phone = String(formData.get("phone") ?? "").trim()
-    const email = String(formData.get("email") ?? "").trim()
-    const subject = String(formData.get("subject") ?? "").trim()
-    const message = String(formData.get("message") ?? "").trim()
+    const trimmedValues: ContactFormValues = {
+      name: values.name.trim(),
+      phone: values.phone.trim(),
+      email: values.email.trim(),
+      subject: values.subject.trim(),
+      message: values.message.trim(),
+    }
 
-    const mailSubject = encodeURIComponent(subject || "Website Contact Enquiry")
-    const mailBody = encodeURIComponent(
-      [
-        `Name: ${name}`,
-        `Phone: ${phone}`,
-        `Email: ${email}`,
-        "",
-        "Message:",
-        message,
-      ].join("\n"),
-    )
+    const validationErrors = validateForm(trimmedValues)
+    setErrors(validationErrors)
+    if (Object.keys(validationErrors).length > 0) return
 
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${mailSubject}&body=${mailBody}`
+    if (!GOOGLE_SHEET_WEBHOOK_URL) {
+      setSubmitMessage(
+        "Form is not configured yet. Please set NEXT_PUBLIC_GOOGLE_SHEET_WEBHOOK_URL.",
+      )
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const payload = new URLSearchParams({
+        ...trimmedValues,
+        source: "website-contact-form",
+        submittedAt: new Date().toISOString(),
+      })
+
+      const response = await fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+        method: "POST",
+        body: payload,
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit form.")
+      }
+
+      setValues(INITIAL_VALUES)
+      setSubmitMessage("Thank you! Your query has been submitted successfully.")
+    } catch {
+      setSubmitMessage("Unable to submit right now. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -55,7 +150,6 @@ export const Contactus = () => {
           <form
             onSubmit={handleSubmit}
             className="mx-auto flex w-full max-w-[936px] flex-col gap-5"
-            noValidate
           >
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div className="flex flex-col gap-4">
@@ -72,8 +166,18 @@ export const Contactus = () => {
                   autoComplete="name"
                   placeholder="Name"
                   required
+                  value={values.name}
+                  onChange={(event) => handleChange("name", event.target.value)}
+                  onBlur={(event) => handleBlur("name", event.target.value)}
+                  aria-invalid={Boolean(errors.name)}
+                  aria-describedby={errors.name ? "contact-name-error" : undefined}
                   className="h-[56px] rounded-[100px] border border-[#EAEAEA] bg-[#FAFAFA] px-[30px] font-dm text-sm leading-[18px] text-black placeholder:text-[#C9C1C1] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/35"
                 />
+                {errors.name ? (
+                  <p id="contact-name-error" className="font-dm text-xs text-red-600">
+                    {errors.name}
+                  </p>
+                ) : null}
               </div>
 
               <div className="flex flex-col gap-4">
@@ -91,8 +195,18 @@ export const Contactus = () => {
                   inputMode="tel"
                   placeholder="+91 Your Number"
                   required
+                  value={values.phone}
+                  onChange={(event) => handleChange("phone", event.target.value)}
+                  onBlur={(event) => handleBlur("phone", event.target.value)}
+                  aria-invalid={Boolean(errors.phone)}
+                  aria-describedby={errors.phone ? "contact-phone-error" : undefined}
                   className="h-[56px] rounded-[100px] border border-[#EAEAEA] bg-[#FAFAFA] px-[30px] font-dm text-sm leading-[18px] text-black placeholder:text-[#C9C1C1] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/35"
                 />
+                {errors.phone ? (
+                  <p id="contact-phone-error" className="font-dm text-xs text-red-600">
+                    {errors.phone}
+                  </p>
+                ) : null}
               </div>
             </div>
 
@@ -110,8 +224,18 @@ export const Contactus = () => {
                 autoComplete="email"
                 placeholder="Your Email Address"
                 required
+                value={values.email}
+                onChange={(event) => handleChange("email", event.target.value)}
+                onBlur={(event) => handleBlur("email", event.target.value)}
+                aria-invalid={Boolean(errors.email)}
+                aria-describedby={errors.email ? "contact-email-error" : undefined}
                 className="h-[56px] rounded-[100px] border border-[#EAEAEA] bg-[#FAFAFA] px-[30px] font-dm text-sm leading-[18px] text-black placeholder:text-[#C9C1C1] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/35"
               />
+              {errors.email ? (
+                <p id="contact-email-error" className="font-dm text-xs text-red-600">
+                  {errors.email}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-4">
@@ -128,8 +252,18 @@ export const Contactus = () => {
                 autoComplete="off"
                 placeholder="Membership Enquiry / General Enquiry"
                 required
+                value={values.subject}
+                onChange={(event) => handleChange("subject", event.target.value)}
+                onBlur={(event) => handleBlur("subject", event.target.value)}
+                aria-invalid={Boolean(errors.subject)}
+                aria-describedby={errors.subject ? "contact-subject-error" : undefined}
                 className="h-[56px] rounded-[100px] border border-[#EAEAEA] bg-[#FAFAFA] px-[30px] font-dm text-sm leading-[18px] text-black placeholder:text-[#C9C1C1] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/35"
               />
+              {errors.subject ? (
+                <p id="contact-subject-error" className="font-dm text-xs text-red-600">
+                  {errors.subject}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-4">
@@ -145,18 +279,32 @@ export const Contactus = () => {
                 rows={5}
                 placeholder="Tell us about yourself and your business."
                 required
+                value={values.message}
+                onChange={(event) => handleChange("message", event.target.value)}
+                onBlur={(event) => handleBlur("message", event.target.value)}
+                aria-invalid={Boolean(errors.message)}
+                aria-describedby={errors.message ? "contact-message-error" : undefined}
                 className="min-h-[150px] resize-y rounded-[18px] border border-[#EAEAEA] bg-[#FAFAFA] px-[30px] py-[17px] font-dm text-sm leading-[21px] text-black placeholder:text-[#C9C1C1] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/35"
               />
+              {errors.message ? (
+                <p id="contact-message-error" className="font-dm text-xs text-red-600">
+                  {errors.message}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex justify-center pt-1">
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="h-12 cursor-pointer rounded-[5px] bg-[#4B55E8] px-5 font-dm text-base font-normal leading-[18px] text-white shadow-[0_15px_16px_-7px_rgba(75,85,232,0.32)]  hover:bg-[#373FAF] focus:outline-none focus:ring-2 focus:ring-[#4B55E8]/40 focus:ring-offset-2 transition-all duration-300 hover:scale-105"
               >
-                Enquiry
+                {isSubmitting ? "Submitting..." : "Enquiry"}
               </button>
             </div>
+            {submitMessage ? (
+              <p className="text-center font-dm text-sm text-[#1E1E1E]">{submitMessage}</p>
+            ) : null}
           </form>
         </div>
       </div>
