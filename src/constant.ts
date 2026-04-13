@@ -49,18 +49,18 @@ export const CONTACT_REGION_LABEL = "Operating Across South Asia India / Nepal /
 
 // ─── Social (footer CTA — real URLs) ────────────────────────────────────────
 export const CTA_SOCIAL_LINKS = [
-  { href: CONTACT_SECTION_HREF, src: "/svg/instragram.svg", label: "Instagram" },
-  { href: CONTACT_SECTION_HREF, src: "/svg/linkedin.svg", label: "LinkedIn" },
-  { href: CONTACT_SECTION_HREF, src: "/svg/twitter.svg", label: "X" },
-  { href: CONTACT_SECTION_HREF, src: "/svg/facebook.svg", label: "Facebook" },
+  { href: "https://www.instagram.com/eo_southasia/", src: "/svg/instragram.svg", label: "Instagram" },
+  { href: "https://www.linkedin.com/company/eosouthasia/", src: "/svg/linkedin.svg", label: "LinkedIn" },
+  { href: "https://x.com/EO_SouthAsia", src: "/svg/twitter.svg", label: "X" },
+  { href: "https://www.facebook.com/EOSouthAsiaOfficial/about/", src: "/svg/facebook.svg", label: "Facebook" },
 ] as const
 
 // ─── Social (placeholder # — hero) ───────────────────────────────────────────
 export const HERO_SOCIAL_LINKS = [
-  { name: "Instagram", href: CONTACT_SECTION_HREF, icon: "/svg/instragram.svg" },
-  { name: "LinkedIn", href: CONTACT_SECTION_HREF, icon: "/svg/linkedin.svg" },
-  { name: "X", href: CONTACT_SECTION_HREF, icon: "/svg/twitter.svg" },
-  { name: "Facebook", href: CONTACT_SECTION_HREF, icon: "/svg/facebook.svg" },
+  { name: "Instagram", href: "https://www.instagram.com/eo_southasia/", icon: "/svg/instragram.svg" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/company/eosouthasia/", icon: "/svg/linkedin.svg" },
+  { name: "X", href: "https://x.com/EO_SouthAsia", icon: "/svg/twitter.svg" },
+  { name: "Facebook", href: "https://www.facebook.com/EOSouthAsiaOfficial/about/", icon: "/svg/facebook.svg" },
 ] as const
 
 // ─── Social (placeholder # — team cards) ────────────────────────────────────

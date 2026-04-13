@@ -39,6 +39,8 @@ export const Herosection = () => {
             <Link
               key={item.name}
               href={item.href}
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label={item.name}
               className="group flex h-[44px] w-[44px] items-center justify-center rounded-[4.4px] bg-[#F4F4F4] p-[11px] transition-colors duration-300 hover:bg-black"
             >

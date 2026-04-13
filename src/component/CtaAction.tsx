@@ -77,6 +77,8 @@ export const CtaAction = () => {
               <li key={s.label}>
                 <a
                   href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex h-[34px] w-[34px] items-center justify-center rounded-full bg-white/22 transition-opacity hover:opacity-90"
                   aria-label={s.label}
                 >
