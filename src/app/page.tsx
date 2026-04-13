@@ -12,11 +12,19 @@ import { Contactus } from "@/component/Contactus";
 export default function Home() {
   return (
     <main>
-      <Herosection />
-      <AboutUs/>
+      <section id="home" className="scroll-mt-24">
+        <Herosection />
+      </section>
+      <section id="about-us" className="scroll-mt-24">
+        <AboutUs />
+      </section>
    
-      <OurTeam />
-      <Services />
+      <section id="what-we-do" className="scroll-mt-24">
+        <OurTeam />
+      </section>
+      <section id="services" className="scroll-mt-24">
+        <Services />
+      </section>
       <WhyChooseus/>
       <Pricing />
       <Contactus/>

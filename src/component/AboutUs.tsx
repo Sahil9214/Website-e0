@@ -99,11 +99,11 @@ const AboutUs = () => {
               </Link>
             </div>
 
-            <div className="flex flex-col gap-4 border-t border-[#E4E4E4] pt-6 sm:flex-row sm:items-center sm:gap-5">
+            <div className="flex flex-col gap-4 border-t border-[#E4E4E4] pt-6 sm:flex-row sm:items-center sm:gap-5 mt-2">
               <span className="font-hanken text-[clamp(3rem,8vw,5rem)] leading-none text-[#FF346E]">
                 {ABOUT_STAT_VALUE}
               </span>
-              <p className="max-w-[246px] font-dm text-[15px] leading-6 text-[#585858]">
+              <p className="max-w-[246px] font-dm text-[15px] leading-6 text-[#585858] mt-1">
                 {ABOUT_STAT_CAPTION}
               </p>
             </div>

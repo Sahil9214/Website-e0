@@ -16,12 +16,17 @@ export const NAVBAR_BRAND = {
 
 // ─── Navigation ─────────────────────────────────────────────────────────────
 export const CONTACT_SECTION_HREF = "/#contact-us"
+export const HOME_SECTION_HREF = "/#home"
+export const ABOUT_SECTION_HREF = "/#about-us"
+export const SERVICES_SECTION_HREF = "/#services"
+export const WHAT_WE_DO_SECTION_HREF = "/#what-we-do";
+export const WHY_CHOOSE_US_SECTION_HREF = "/#why-choose-us";
 
 export const NAV_LINKS = [
-  { label: "Home", href: CONTACT_SECTION_HREF },
-  { label: "About Us", href: CONTACT_SECTION_HREF },
-  { label: "Services", href: CONTACT_SECTION_HREF },
-  { label: "What we do", href: CONTACT_SECTION_HREF },
+  { label: "Home", href: HOME_SECTION_HREF },
+  { label: "About Us", href: ABOUT_SECTION_HREF },
+  { label: "Services", href: SERVICES_SECTION_HREF },
+  { label: "Why Choose Us", href: WHY_CHOOSE_US_SECTION_HREF },
   { label: "Contact Us", href: CONTACT_SECTION_HREF },
 ] as const
 

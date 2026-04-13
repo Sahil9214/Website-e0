@@ -18,7 +18,10 @@ import {
 
 export const WhyChooseus = () => {
   return (
-    <section className="w-full bg-white py-12 sm:py-14 lg:py-16">
+    <section
+      id="why-choose-us"
+      className="w-full scroll-mt-24 bg-white py-12 sm:py-14 lg:py-16"
+    >
       <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-4">
         <div className="flex w-full flex-col items-stretch gap-8 rounded-[20px] bg-black p-6 sm:p-8 lg:flex-row lg:items-start lg:gap-[90px] lg:p-10">
           {/* Left: image + glass card */}
