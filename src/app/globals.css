@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+
+:root{
+  --color:#585858;
+  -bg-experience:#FF346E0D;
+  --color-experience:#7A7A7A;
+  --arrow:#4B55E8;
+  --navbar-heading-color:#0D1B3E;
+  --navbar-text-color:#6B6B80;
+}
+
+body {
+  font-family: var(--font-hanken-grotesk), sans-serif;
+}
+
+.font-hanken {
+  font-family: var(--font-hanken-grotesk), sans-serif;
+}
+
+.font-dm {
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
